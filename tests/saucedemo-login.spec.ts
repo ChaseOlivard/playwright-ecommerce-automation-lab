@@ -49,7 +49,7 @@ test('Successful remove from cart', async ({ page }) => {
 
     await page.getByPlaceholder('Username').fill('standard_user');
     await page.getByPlaceholder('Password').fill('secret_sauce');
-    await page.getByRole('button', {name: 'Login'}).click();
+    await page.getByRole('button', { name: 'Login' }).click();
 
     const backpackCard = page
         .locator('[data-test="inventory-item"]')
@@ -62,3 +62,29 @@ test('Successful remove from cart', async ({ page }) => {
     await expect(page.getByText('Sauce Labs Backpack')).not.toBeVisible();
 });
 
+test('Successful checkout', async ({ page }) => {
+    await page.goto('https://www.saucedemo.com/');
+
+    await page.getByPlaceholder('Username').fill('standard_user');
+    await page.getByPlaceholder('Password').fill('secret_sauce');
+    await page.getByRole('button', { name: 'Login' }).click();
+
+    const backpackCard = page
+        .locator('[data-test="inventory-item"]')
+        .filter({ hasText: 'Sauce Labs Backpack' });
+    await backpackCard.getByRole('button', { name: 'Add to cart' }).click();
+   
+    await page.locator('[data-test="shopping-cart-link"]').click();
+    await page.getByRole('button', {name: 'Checkout'}).click();
+
+    await page.getByPlaceholder('First Name').fill('standard');
+    await page.getByPlaceholder('Last Name').fill('user');
+    await page.getByPlaceholder('Zip/Postal Code').fill('70806');
+    await page.getByRole('button', {name: 'Continue'}).click();
+
+    await expect(page.getByText('Sauce Labs Backpack')).toBeVisible();
+    await expect(page.getByText('Checkout: Overview')).toBeVisible();
+    await page.getByRole('button', {name: 'Finish'}).click();
+
+    await expect(page.getByText('Thank you for your order!')).toBeVisible();
+});
