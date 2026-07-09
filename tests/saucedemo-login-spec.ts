@@ -1,39 +1,35 @@
 import { test, expect} from '@playwright/test';
+import { LoginPage } from '../pages/Login-Page';
+
 
 test('login page loads' , async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
+    const loginPage = new LoginPage(page);
 
-    await expect(page.getByPlaceholder('Username')).toBeVisible();
-    await expect(page.getByPlaceholder('Password')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+    await loginPage.goto();
+    await loginPage.expectLoginFormVisible();
 });
 
 test('successful login shows products page', async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
+    const loginPage = new LoginPage(page);
 
-    await page.getByPlaceholder('Username').fill('standard_user');
-    await page.getByPlaceholder('Password').fill('secret_sauce');
-    await page.getByRole('button', {name: 'Login'}).click();
+    await loginPage.goto();
+    await loginPage.login('standard_user', 'secret_sauce');
     await expect(page.getByText('Products')).toBeVisible();
-
 });
 
 test('invalid login shows error', async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
-    
-    await page.getByPlaceholder('Username').fill('standard_user');
-    await page.getByPlaceholder('Password').fill('secret_ssauce');
-    await page.getByRole('button', { name: 'Login' }).click();
-    await expect(page.getByText('Epic sadface: Username and password do not match any user in this service')).toBeVisible();
+    const loginPage = new LoginPage(page);
 
+    await loginPage.goto();
+    await loginPage.login('standard_user', 'secret_ssauce');
+    await loginPage.expectLoginErrorVisible();
 });
 
 test('Successful add to cart', async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
+    const loginPage = new LoginPage(page);
 
-    await page.getByPlaceholder('Username').fill('standard_user');
-    await page.getByPlaceholder('Password').fill('secret_sauce');
-    await page.getByRole('button', {name: 'Login'}).click();
+    await loginPage.goto();
+    await loginPage.login('standard_user', 'secret_sauce');
 
     const backpackCard = page
         .locator('[data-test="inventory-item"]')
@@ -45,12 +41,10 @@ test('Successful add to cart', async ({ page }) => {
 });
 
 test('Successful remove from cart', async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
+    const loginPage = new LoginPage(page);
 
-    await page.getByPlaceholder('Username').fill('standard_user');
-    await page.getByPlaceholder('Password').fill('secret_sauce');
-    await page.getByRole('button', { name: 'Login' }).click();
-
+    await loginPage.goto();
+    await loginPage.login('standard_user', 'secret_sauce');
     const backpackCard = page
         .locator('[data-test="inventory-item"]')
         .filter({ hasText: 'Sauce Labs Backpack' });
@@ -63,12 +57,10 @@ test('Successful remove from cart', async ({ page }) => {
 });
 
 test('Successful checkout', async ({ page }) => {
-    await page.goto('https://www.saucedemo.com/');
+    const loginPage = new LoginPage(page);
 
-    await page.getByPlaceholder('Username').fill('standard_user');
-    await page.getByPlaceholder('Password').fill('secret_sauce');
-    await page.getByRole('button', { name: 'Login' }).click();
-
+    await loginPage.goto();
+    await loginPage.login('standard_user', 'secret_sauce');
     const backpackCard = page
         .locator('[data-test="inventory-item"]')
         .filter({ hasText: 'Sauce Labs Backpack' });
