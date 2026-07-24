@@ -77,3 +77,19 @@ test('GET /products/search returns phone-related products', async({ request }) =
     expect(firstProduct.category).toBeDefined();
     expect(typeof firstProduct.category).toBe('string');
 });
+test('GET /products/999999 returns not found error', async({ request }) => {
+    const response = await request.get('https://dummyjson.com/products/999999');
+    
+    expect(response.status()).toBe(404);
+    expect(response.headers()['content-type']).toContain('application/json');
+    
+    const body = await response.json();
+
+    expect(body.message).toBeDefined();
+    expect(typeof body.message).toBe('string');
+    expect(body.message.toLowerCase()).toContain('not found');
+
+    expect(body.id).toBeUndefined();
+    expect(body.title).toBeUndefined();
+    expect(body.price).toBeUndefined();
+});
